@@ -1,7 +1,7 @@
 name: Build and Push Admin Docker Image
 
 on:
-  push:
+  push: 
     branches:
       - main
 
