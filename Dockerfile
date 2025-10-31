@@ -2,7 +2,7 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json ./ 
 RUN npm ci
 
 COPY . .
@@ -19,7 +19,7 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV HOST=0.0.0.0
+ENV HOST=0.0.0.0 
 ENV PORT=3000
 
 COPY package.json package-lock.json ./
