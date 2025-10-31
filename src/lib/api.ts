@@ -11,6 +11,7 @@ class ApiClient {
   constructor() {
     this.client = axios.create({
       baseURL: API_BASE_URL,
+      withCredentials: true, // ✅ THIS IS THE FIX - Enables sending cookies with requests
       headers: {
         "Content-Type": "application/json",
       },
@@ -156,7 +157,7 @@ class ApiClient {
     const response = await this.client.post("/admin/auth/login", {
       email,
       password,
-      ipAddress, // You can get real IP from a service if needed
+      ipAddress,
       userAgent,
     });
 
@@ -164,8 +165,10 @@ class ApiClient {
 
     // Store tokens
     this.setTokens(accessToken, refreshToken);
-    document.cookie = `accessToken=${accessToken}; path=/`;
-    document.cookie = `refreshToken=${refreshToken}; path=/`;
+
+    // Set cookies with proper attributes
+    document.cookie = `accessToken=${accessToken}; path=/; SameSite=None; Secure`;
+    document.cookie = `refreshToken=${refreshToken}; path=/; SameSite=None; Secure`;
 
     return { user };
   }
@@ -175,12 +178,15 @@ class ApiClient {
       await this.client.post("/admin/auth/logout");
     } finally {
       this.clearTokens();
+      // Clear cookies
+      document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie = "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     }
   }
 
   async getCurrentUser() {
     const response = await this.client.get("/admin/auth/profile");
-    return response.data.data; // Extract user from ApiResponseDto wrapper
+    return response.data.data;
   }
 
   async changePassword(
