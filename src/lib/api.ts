@@ -154,7 +154,7 @@ class ApiClient {
     ipAddress: string,
     userAgent: string
   ) {
-    const response = await this.client.post("/admin/auth/login", {
+    const response = await this.client.post("/auth/login", {
       email,
       password,
       ipAddress,
@@ -175,7 +175,7 @@ class ApiClient {
 
   async logout() {
     try {
-      await this.client.post("/admin/auth/logout");
+      await this.client.post("/auth/logout");
     } finally {
       this.clearTokens();
       // Clear cookies
@@ -185,7 +185,7 @@ class ApiClient {
   }
 
   async getCurrentUser() {
-    const response = await this.client.get("/admin/auth/profile");
+    const response = await this.client.get("/auth/profile");
     return response.data.data;
   }
 
@@ -194,7 +194,7 @@ class ApiClient {
     newPassword: string,
     confirmPassword: string
   ) {
-    const response = await this.client.patch("/admin/auth/change-password", {
+    const response = await this.client.patch("/auth/change-password", {
       currentPassword,
       newPassword,
       confirmPassword,
@@ -209,7 +209,7 @@ class ApiClient {
       throw new Error("No refresh token available");
     }
 
-    const response = await this.client.post("/admin/auth/refresh", {
+    const response = await this.client.post("/auth/refresh", {
       refreshToken,
     });
 

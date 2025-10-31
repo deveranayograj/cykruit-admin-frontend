@@ -2,63 +2,63 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const API_ENDPOINTS = {
   // Auth
-  LOGIN: '/admin/auth/login',
-  LOGOUT: '/admin/auth/logout',
-  PROFILE: '/admin/auth/profile',
-  REFRESH_TOKEN: '/admin/auth/refresh',
+  LOGIN: '/auth/login',
+  LOGOUT: '/auth/logout',
+  PROFILE: '/auth/profile',
+  REFRESH_TOKEN: '/auth/refresh',
 
   // KYC
-  KYC_LIST: '/admin/kyc-review/list',
-  KYC_DETAIL: (id: string) => `/admin/kyc-review/${id}`,
-  KYC_APPROVE: () => `/admin/kyc-review/approve`,
-  KYC_REJECT: () => `/admin/kyc-review/reject`,
+  KYC_LIST: '/kyc-review/list',
+  KYC_DETAIL: (id: string) => `/kyc-review/${id}`,
+  KYC_APPROVE: () => `/kyc-review/approve`,
+  KYC_REJECT: () => `/kyc-review/reject`,
 
   // Users
-  USERS_LIST: '/admin/users',
-  USER_DETAIL: (id: string) => `/admin/users/${id}`,
+  USERS_LIST: '/users',
+  USER_DETAIL: (id: string) => `/users/${id}`,
 
   // Employers
-  EMPLOYERS_LIST: '/admin/employers',
-  EMPLOYER_DETAIL: (id: string) => `/admin/employers/${id}`,
-  EMPLOYER_FLAG: (id: string) => `/admin/employers/${id}/flag`,
+  EMPLOYERS_LIST: '/employers',
+  EMPLOYER_DETAIL: (id: string) => `/employers/${id}`,
+  EMPLOYER_FLAG: (id: string) => `/employers/${id}/flag`,
 
   // Jobs
-  JOBS_LIST: '/admin/jobs',
-  JOB_DETAIL: (id: string) => `/admin/jobs/${id}`,
-  JOB_APPROVE: (id: string) => `/admin/jobs/${id}/approve`,
-  JOB_REJECT: (id: string) => `/admin/jobs/${id}/reject`,
+  JOBS_LIST: '/jobs',
+  JOB_DETAIL: (id: string) => `/jobs/${id}`,
+  JOB_APPROVE: (id: string) => `/jobs/${id}/approve`,
+  JOB_REJECT: (id: string) => `/jobs/${id}/reject`,
 
   // Dashboard
-  DASHBOARD_OVERVIEW: '/admin/dashboard/overview',
-  DASHBOARD_RECENT_ACTIVITY: '/admin/dashboard/recent-activity',
-  DASHBOARD_USER_GROWTH: '/admin/dashboard/user-growth',
-  DASHBOARD_JOB_STATISTICS: '/admin/dashboard/job-statistics',
-  DASHBOARD_APPLICATION_FUNNEL: '/admin/dashboard/application-funnel',
-  DASHBOARD_TOP_EMPLOYERS: '/admin/dashboard/top-employers',
-  DASHBOARD_PENDING_REVIEWS: '/admin/dashboard/pending-reviews',
+  DASHBOARD_OVERVIEW: '/dashboard/overview',
+  DASHBOARD_RECENT_ACTIVITY: '/dashboard/recent-activity',
+  DASHBOARD_USER_GROWTH: '/dashboard/user-growth',
+  DASHBOARD_JOB_STATISTICS: '/dashboard/job-statistics',
+  DASHBOARD_APPLICATION_FUNNEL: '/dashboard/application-funnel',
+  DASHBOARD_TOP_EMPLOYERS: '/dashboard/top-employers',
+  DASHBOARD_PENDING_REVIEWS: '/dashboard/pending-reviews',
 
   // 🧩 Skills
-  META_SKILLS_LIST: '/admin/meta/skills',
-  META_SKILL_CREATE: '/admin/meta/skills',
-  META_SKILL_UPDATE: (id: string) => `/admin/meta/skills/${id}`,
-  META_SKILL_DELETE: (id: string) => `/admin/meta/skills/${id}`,
+  META_SKILLS_LIST: '/meta/skills',
+  META_SKILL_CREATE: '/meta/skills',
+  META_SKILL_UPDATE: (id: string) => `/meta/skills/${id}`,
+  META_SKILL_DELETE: (id: string) => `/meta/skills/${id}`,
 
   // 🧩 Certifications
-  META_CERTIFICATIONS_LIST: '/admin/meta/certifications',
-  META_CERTIFICATION_CREATE: '/admin/meta/certifications',
-  META_CERTIFICATION_UPDATE: (id: string) => `/admin/meta/certifications/${id}`,
-  META_CERTIFICATION_DELETE: (id: string) => `/admin/meta/certifications/${id}`,
+  META_CERTIFICATIONS_LIST: '/meta/certifications',
+  META_CERTIFICATION_CREATE: '/meta/certifications',
+  META_CERTIFICATION_UPDATE: (id: string) => `/meta/certifications/${id}`,
+  META_CERTIFICATION_DELETE: (id: string) => `/meta/certifications/${id}`,
 
   // 🧩 Roles
-  META_ROLES_LIST: '/admin/meta/roles',
-  META_ROLE_CREATE: '/admin/meta/roles',
-  META_ROLE_UPDATE: (id: string) => `/admin/meta/roles/${id}`,
-  META_ROLE_DELETE: (id: string) => `/admin/meta/roles/${id}`,
+  META_ROLES_LIST: '/meta/roles',
+  META_ROLE_CREATE: '/meta/roles',
+  META_ROLE_UPDATE: (id: string) => `/meta/roles/${id}`,
+  META_ROLE_DELETE: (id: string) => `/meta/roles/${id}`,
 
   // 🧩 Job Categories
-  META_JOB_CATEGORIES_LIST: '/admin/meta/job-categories',
-  META_JOB_CATEGORY_CREATE: '/admin/meta/job-categories',
-  META_JOB_CATEGORY_UPDATE: (id: string) => `/admin/meta/job-categories/${id}`,
-  META_JOB_CATEGORY_DELETE: (id: string) => `/admin/meta/job-categories/${id}`,
+  META_JOB_CATEGORIES_LIST: '/meta/job-categories',
+  META_JOB_CATEGORY_CREATE: '/meta/job-categories',
+  META_JOB_CATEGORY_UPDATE: (id: string) => `/meta/job-categories/${id}`,
+  META_JOB_CATEGORY_DELETE: (id: string) => `/meta/job-categories/${id}`,
 
 };
