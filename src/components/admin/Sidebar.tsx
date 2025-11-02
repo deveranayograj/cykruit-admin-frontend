@@ -96,12 +96,11 @@ export const Sidebar: React.FC<{
       path: '/admin/jobs',
       children: [
         { label: 'All Jobs', icon: null, path: '/admin/jobs' },
-        { label: 'Pending Approval', icon: <AlertCircle className="w-4 h-4" />, path: '/admin/jobs/pending' },
-        { label: 'Active', icon: <CheckCircle className="w-4 h-4" />, path: '/admin/jobs/active' },
-        { label: 'Draft', icon: null, path: '/admin/jobs/draft' },
-        { label: 'Expired', icon: null, path: '/admin/jobs/expired' },
-        { label: 'Archived', icon: <Archive className="w-4 h-4" />, path: '/admin/jobs/archived' },
-        { label: 'Featured', icon: <Star className="w-4 h-4" />, path: '/admin/jobs/featured' }
+        { label: 'Pending Approval', icon: <AlertCircle className="w-4 h-4" />, path: '/admin/jobs?status=pending' },
+        { label: 'Active', icon: <CheckCircle className="w-4 h-4" />, path: '/admin/jobs?status=active' },
+        { label: 'Draft', icon: null, path: '/admin/jobs?status=draft' },
+        { label: 'Expired', icon: null, path: '/admin/jobs?status=expired' },
+        { label: 'Archived', icon: <Archive className="w-4 h-4" />, path: '/admin/jobs?status=archived' },
       ]
     },
     {
