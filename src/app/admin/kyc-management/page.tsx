@@ -55,6 +55,9 @@ const KYCListContent: React.FC = () => {
     if (statusParam) {
       setStatusFilter(statusParam.toUpperCase() as StatusFilter);
     }
+    else {
+      setStatusFilter('all');
+    }
   }, [searchParams]);
 
   useEffect(() => {

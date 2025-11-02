@@ -52,6 +52,9 @@ const UsersPage: React.FC = () => {
     if (roleParam) {
       setRoleFilter(roleParam.toUpperCase() as RoleFilter);
     }
+    else {
+      setRoleFilter('all');
+    }
   }, [searchParams]);
 
   const { loading, error, execute } = useApi({
