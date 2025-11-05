@@ -33,27 +33,18 @@ const JobDetailPage: React.FC = () => {
     }
   }, [id]);
 
-  const handleApprove = async () => {
-    if (confirm('Are you sure you want to approve this job?')) {
-      try {
-        await jobService.approveJob(id);
-        alert('Job Approved!');
-        window.location.href = '/admin/jobs';
-      } catch (error: any) {
-        alert(`Failed to approve: ${error.message}`);
-      }
-    }
+  const handleEdit = () => {
+    window.location.href = `/admin/jobs/${id}/edit`;
   };
 
-  const handleReject = async () => {
-    const reason = prompt('Please provide a reason for rejection:');
-    if (reason) {
+  const handleDelete = async () => {
+    if (confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
       try {
-        await jobService.rejectJob(id, reason);
-        alert('Job Rejected!');
+        await jobService.deleteJob(id);
+        alert('Job Deleted!');
         window.location.href = '/admin/jobs';
       } catch (error: any) {
-        alert(`Failed to reject: ${error.message}`);
+        alert(`Failed to delete: ${error.message}`);
       }
     }
   };
@@ -109,10 +100,11 @@ const JobDetailPage: React.FC = () => {
         
         <div className="space-y-6">
           <StatisticsCard job={jobData} />
+          <ModerationCard job={jobData} />
           <ActionButtons 
             job={jobData}
-            onApprove={handleApprove}
-            onReject={handleReject}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
           />
         </div>
       </div>

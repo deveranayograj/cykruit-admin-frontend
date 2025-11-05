@@ -4,7 +4,9 @@ import {
   JobsListResponse,
   JobDetail,
   StatusFilter,
-  JobActionResponse,
+  JobUpdateRequest,
+  JobUpdateResponse,
+  JobDeleteResponse,
 } from "@/types/job";
 
 // Generic API response type (matching backend structure)
@@ -55,19 +57,19 @@ export const jobService = {
     return response.data; // ✅ unwrap
   },
 
-  // ✅ Approve Job
-  async approveJob(id: string): Promise<JobActionResponse> {
-    const response = await apiClient.post<ApiResponse<JobActionResponse>>(
-      API_ENDPOINTS.JOB_APPROVE(id)
+  // ✅ Update Job
+  async updateJob(id: string, data: JobUpdateRequest): Promise<JobUpdateResponse> {
+    const response = await apiClient.put<ApiResponse<JobUpdateResponse>>(
+      API_ENDPOINTS.JOB_DETAIL(id),
+      data
     );
     return response.data; // ✅ unwrap
   },
 
-  // ✅ Reject Job
-  async rejectJob(id: string, reason: string): Promise<JobActionResponse> {
-    const response = await apiClient.post<ApiResponse<JobActionResponse>>(
-      API_ENDPOINTS.JOB_REJECT(id),
-      { rejectionReason: reason }
+  // ✅ Delete Job
+  async deleteJob(id: string): Promise<JobDeleteResponse> {
+    const response = await apiClient.delete<ApiResponse<JobDeleteResponse>>(
+      API_ENDPOINTS.JOB_DETAIL(id)
     );
     return response.data; // ✅ unwrap
   },

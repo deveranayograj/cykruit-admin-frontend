@@ -115,18 +115,27 @@ export interface JobDetailResponse {
   data: JobDetail;
 }
 
-export interface JobApproveRequest {
-  jobId: string;
-  remarks?: string;
+export interface JobUpdateRequest {
+  title?: string;
+  description?: string;
+  workMode?: 'REMOTE' | 'ONSITE' | 'HYBRID';
+  employmentType?: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP';
+  experience?: 'ENTRY' | 'MID' | 'SENIOR' | 'LEAD';
+  status?: 'DRAFT' | 'PENDING' | 'ACTIVE' | 'EXPIRED' | 'ARCHIVED';
+  contractDurationInMonths?: number;
+  applyType?: 'DIRECT' | 'EXTERNAL';
+  applyUrl?: string;
+  validTill?: string;
+  roleId?: string;
+  locationId?: string;
 }
 
-export interface JobRejectRequest {
-  jobId: string;
-  rejectionReason: string;
-  remarks?: string;
+export interface JobUpdateResponse {
+  message: string;
+  data: JobDetail;
 }
 
-export interface JobActionResponse {
+export interface JobDeleteResponse {
   message: string;
   jobId: string;
 }
