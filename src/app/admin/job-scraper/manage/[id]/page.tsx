@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
@@ -446,7 +448,7 @@ const ScrapedJobDetailPage: React.FC = () => {
   }, [id]);
 
   const handleEdit = () => {
-    window.location.href = `/admin/job-scraper/manage/${id}`;
+    window.location.href = `/admin/job-scraper/manage/${id}/edit`;
   };
 
   const handleDelete = async () => {
@@ -508,11 +510,12 @@ const ScrapedJobDetailPage: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           <JobInfoCard job={jobData} />
           <SkillsCertificationsCard job={jobData} />
+          <LocationRoleCard job={jobData} />
         </div>
         
         <div className="space-y-6">
           <CompanyInfoCard job={jobData} />
-          <LocationRoleCard job={jobData} />
+          
           <MetadataCard job={jobData} />
           <ActionButtons 
             jobId={jobData.id}

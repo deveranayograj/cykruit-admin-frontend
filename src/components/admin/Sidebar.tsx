@@ -6,7 +6,6 @@ import { SidebarItem } from "@/components/admin/SidebarItem";
 import {
   LayoutDashboard,
   Users,
-  Building2,
   Briefcase,
   FileText,
   FolderTree,
@@ -14,7 +13,6 @@ import {
   AlertCircle,
   CheckCircle,
   XCircle,
-  Flag,
   Download,
   Archive,
   Award,
@@ -70,15 +68,6 @@ export const Sidebar: React.FC<{
         { label: 'All Users', icon: null, path: '/admin/users' },
         { label: 'Job Seekers', icon: <UserSearch className="w-4 h-4" />, path: '/admin/users?role=SEEKER' },
         { label: 'Employers', icon: <UserPlus className="w-4 h-4" />, path: '/admin/users?role=EMPLOYER' }
-      ]
-    },
-    {
-      label: 'Employers',
-      icon: <Building2 className="w-5 h-5" />,
-      path: '/admin/employers',
-      children: [
-        { label: 'All Employers', icon: null, path: '/admin/employers' },
-        { label: 'Flagged', icon: <Flag className="w-4 h-4" />, path: '/admin/employers/flagged' }
       ]
     },
     {

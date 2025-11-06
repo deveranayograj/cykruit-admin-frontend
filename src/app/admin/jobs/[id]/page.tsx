@@ -13,12 +13,16 @@ import { JobInfoCard } from '@/components/jobs-details/JobInfoCard';
 import { StatisticsCard } from '@/components/jobs-details/StatisticsCard';
 import { ModerationCard } from '@/components/jobs-details/ModerationCard';
 import { ActionButtons } from '@/components/jobs-details/ActionButtons';
+import { EmployerInfoCard } from '@/components/jobs-details/EmployerInfoCard';
+import { LocationRoleCard } from '@/components/jobs-details/LocationRoleCard';
+import { SkillsCard } from '@/components/jobs-details/SkillsCard';
+
 
 // Main Component
 const JobDetailPage: React.FC = () => {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "";
-  
+
   const [jobData, setJobData] = useState<JobDetail | null>(null);
 
   const { loading, error, execute } = useApi({
@@ -84,7 +88,7 @@ const JobDetailPage: React.FC = () => {
       <Breadcrumb jobTitle={jobData.title} />
 
       <div className="mb-6">
-        <Link 
+        <Link
           href="/admin/jobs"
           className="text-blue-600 hover:text-blue-800 text-sm font-medium"
         >
@@ -96,12 +100,15 @@ const JobDetailPage: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           <JobInfoCard job={jobData} />
           <ModerationCard job={jobData} />
+          <LocationRoleCard job={jobData} />
+          <SkillsCard job={jobData} />
         </div>
-        
+
         <div className="space-y-6">
+          <EmployerInfoCard job={jobData} />
           <StatisticsCard job={jobData} />
           <ModerationCard job={jobData} />
-          <ActionButtons 
+          <ActionButtons
             job={jobData}
             onEdit={handleEdit}
             onDelete={handleDelete}
