@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -109,7 +108,7 @@ const GeneratedJobRow: React.FC<{
 // Main Component
 const GenerateJobsPage: React.FC = () => {
   // Form state
-  const [source, setSource] = useState('ai');
+  const [source, setSource] = useState('naukri');
   const [category, setCategory] = useState('Cyber Security');
   const [count, setCount] = useState(5);
 

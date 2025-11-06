@@ -5,7 +5,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from "next/navigation";
 import Link from 'next/link';
-import { ChevronRight, Search, Edit, Trash2, Briefcase, MapPin, Clock, Database, FileX, AlertCircle } from 'lucide-react';
+import { ChevronRight, Search, Edit, Eye, Trash2, Briefcase, MapPin, Clock, Database, FileX, AlertCircle } from 'lucide-react';
 import { scrapedJobService } from "@/services/scrapedJobService";
 import { useApi } from "@/hooks/useApi";
 import { ScrapedJobRecord, ScrapedJobStatusFilter } from "@/types/scraped-job";
@@ -308,9 +308,12 @@ const ScrapedJobsListContent: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  const handleView = (id: string) => {
+    window.location.href = `/admin/job-scraper/manage/${id}`;
+  };
 
   const handleEdit = (id: string) => {
-    window.location.href = `/admin/job-scraper/manage/${id}`;
+    window.location.href = `/admin/job-scraper/manage/${id}/edit`;
   };
 
   const handleDelete = async (id: string) => {
@@ -413,7 +416,7 @@ const ScrapedJobsListContent: React.FC = () => {
                     <td className="px-6 py-4">
                       <div>
                         <button
-                          onClick={() => handleEdit(job.id)}
+                          onClick={() => handleView(job.id)}
                           className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer text-left"
                         >
                           {job.title}
@@ -450,7 +453,13 @@ const ScrapedJobsListContent: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        
+                        <button
+                          onClick={() => handleView(job.id)}
+                          className="p-1.5 text-blue-600 hover:bg-blue-100 rounded transition-colors cursor-pointer"
+                          title="View Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() => handleEdit(job.id)}
                           className="p-1.5 text-green-600 hover:bg-green-100 rounded transition-colors cursor-pointer"

@@ -5,10 +5,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, Save, X, Loader2 } from 'lucide-react';
+import { 
+  ChevronRight, Building2, MapPin, Briefcase, Clock, 
+  Users, Eye, Calendar, Edit, Trash2, Database, Link as LinkIcon,
+  Award, Code
+} from 'lucide-react';
 import { scrapedJobService } from "@/services/scrapedJobService";
 import { useApi } from "@/hooks/useApi";
-import { ScrapedJobDetail, UpdateScrapedJobDto } from "@/types/scraped-job";
+import { ScrapedJobDetail } from "@/types/scraped-job";
 
 // Breadcrumb Component
 const Breadcrumb: React.FC<{ jobTitle?: string }> = ({ jobTitle }) => {
@@ -18,82 +22,420 @@ const Breadcrumb: React.FC<{ jobTitle?: string }> = ({ jobTitle }) => {
       <ChevronRight className="w-4 h-4" />
       <Link href="/admin/dashboard" className="hover:text-gray-900">Admin Dashboard</Link>
       <ChevronRight className="w-4 h-4" />
-      <Link href="/admin/job-scraper/manage" className="hover:text-gray-900">Scraped Jobs Management</Link>
+      <Link href="/admin/job-scraper/manage" className="hover:text-gray-900">Scraped Jobs</Link>
       <ChevronRight className="w-4 h-4" />
-      <span className="text-gray-900 font-medium">Edit: {jobTitle || 'Job'}</span>
+      <span className="text-gray-900 font-medium">{jobTitle || 'Job Details'}</span>
     </nav>
   );
 };
 
+// Status Badge Component
+const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  const styles: Record<string, string> = {
+    DRAFT: 'bg-gray-100 text-gray-800 border-gray-200',
+    PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    ACTIVE: 'bg-green-100 text-green-800 border-green-200',
+    EXPIRED: 'bg-orange-100 text-orange-800 border-orange-200',
+    ARCHIVED: 'bg-slate-100 text-slate-800 border-slate-200',
+  };
+
+  return (
+    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${styles[status] || 'bg-gray-100 text-gray-800'}`}>
+      {status}
+    </span>
+  );
+};
+
+// Source Badge
+const SourceBadge: React.FC<{ source: string }> = ({ source }) => {
+  const styles: Record<string, string> = {
+    indeed: 'bg-blue-100 text-blue-800 border-blue-200',
+    linkedin: 'bg-blue-100 text-blue-800 border-blue-200',
+    glassdoor: 'bg-green-100 text-green-800 border-green-200',
+    ai: 'bg-purple-100 text-purple-800 border-purple-200',
+  };
+
+  const displayName = source.charAt(0).toUpperCase() + source.slice(1);
+
+  return (
+    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${styles[source.toLowerCase()] || 'bg-gray-100 text-gray-800'}`}>
+      <Database className="w-4 h-4 mr-1" />
+      {displayName}
+    </span>
+  );
+};
+
+// Job Info Card
+const JobInfoCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex-1">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{job.title}</h2>
+          <div className="flex items-center gap-4 text-gray-600 mb-4">
+            <div className="flex items-center gap-1">
+              <Building2 className="w-4 h-4" />
+              <span>{job.company.name}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Briefcase className="w-4 h-4" />
+              <span>{job.role.name}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <StatusBadge status={job.status} />
+          <SourceBadge source={job.source} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="flex items-center gap-2 text-sm">
+          <MapPin className="w-4 h-4 text-gray-400" />
+          <div>
+            <div className="text-gray-500 text-xs">Work Mode</div>
+            <div className="font-medium">{job.workMode}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Clock className="w-4 h-4 text-gray-400" />
+          <div>
+            <div className="text-gray-500 text-xs">Type</div>
+            <div className="font-medium">{job.employmentType.replace('_', ' ')}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Users className="w-4 h-4 text-gray-400" />
+          <div>
+            <div className="text-gray-500 text-xs">Experience</div>
+            <div className="font-medium">{job.experience}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Database className="w-4 h-4 text-gray-400" />
+          <div>
+            <div className="text-gray-500 text-xs">External ID</div>
+            <div className="font-medium text-xs">{job.externalJobId || 'N/A'}</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-200 pt-6">
+        <h3 className="text-lg font-semibold mb-4">Job Description</h3>
+        <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
+          {job.description}
+        </div>
+      </div>
+
+      {job.applyUrl && (
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center gap-2 text-blue-800 mb-2">
+            <LinkIcon className="w-4 h-4" />
+            <span className="font-medium">Application Link:</span>
+          </div>
+          <a 
+            href={job.applyUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 text-sm break-all"
+          >
+            {job.applyUrl}
+          </a>
+        </div>
+      )}
+
+      {job.originalUrl && job.originalUrl !== job.applyUrl && (
+        <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <div className="flex items-center gap-2 text-gray-700 mb-2">
+            <LinkIcon className="w-4 h-4" />
+            <span className="font-medium">Original Source URL:</span>
+          </div>
+          <a 
+            href={job.originalUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-gray-600 hover:text-gray-800 text-sm break-all"
+          >
+            {job.originalUrl}
+          </a>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Company Info Card
+const CompanyInfoCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 className="text-lg font-semibold mb-4">Company Information</h3>
+      
+      <div className="space-y-4">
+        {job.company.logo && (
+          <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg">
+            <img 
+              src={job.company.logo} 
+              alt={job.company.name}
+              className="max-h-20 object-contain"
+            />
+          </div>
+        )}
+
+        <div className="space-y-3">
+          <div>
+            <div className="text-sm text-gray-500">Company Name</div>
+            <div className="font-medium text-gray-900">{job.company.name}</div>
+          </div>
+
+          {job.company.website && (
+            <div>
+              <div className="text-sm text-gray-500">Website</div>
+              <a 
+                href={job.company.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 text-sm"
+              >
+                {job.company.website}
+              </a>
+            </div>
+          )}
+
+          {job.company.size && (
+            <div>
+              <div className="text-sm text-gray-500">Company Size</div>
+              <div className="font-medium text-gray-900">{job.company.size}</div>
+            </div>
+          )}
+
+          {job.company.industry && (
+            <div>
+              <div className="text-sm text-gray-500">Industry</div>
+              <div className="font-medium text-gray-900">{job.company.industry}</div>
+            </div>
+          )}
+
+          {job.company.about && (
+            <div>
+              <div className="text-sm text-gray-500 mb-1">About</div>
+              <div className="text-sm text-gray-700">{job.company.about}</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Location & Role Card
+const LocationRoleCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 className="text-lg font-semibold mb-4">Location & Role</h3>
+      
+      <div className="space-y-4">
+        {job.location && (
+          <div>
+            <div className="text-sm text-gray-500 mb-2">Location</div>
+            <div className="flex items-start gap-2">
+              <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
+              <div className="text-gray-900">
+                {job.location.city && <div>{job.location.city}</div>}
+                {job.location.state && <div>{job.location.state}</div>}
+                {job.location.country && <div>{job.location.country}</div>}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="border-t border-gray-100 pt-4">
+          <div className="text-sm text-gray-500 mb-2">Role</div>
+          <div className="font-medium text-gray-900">{job.role.name}</div>
+          {job.role.category && (
+            <div className="text-sm text-gray-600 mt-1">
+              Category: {job.role.category.title}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Skills & Certifications Card
+const SkillsCertificationsCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
+  if (!job.skills?.length && !job.certifications?.length) {
+    return null;
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 className="text-lg font-semibold mb-4">Skills & Certifications</h3>
+      
+      <div className="space-y-4">
+        {job.skills && job.skills.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+              <Code className="w-4 h-4" />
+              <span>Skills</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {job.skills.map((skill) => (
+                <span 
+                  key={skill.id}
+                  className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
+                >
+                  {skill.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {job.certifications && job.certifications.length > 0 && (
+          <div className={job.skills?.length ? 'border-t border-gray-100 pt-4' : ''}>
+            <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+              <Award className="w-4 h-4" />
+              <span>Certifications</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {job.certifications.map((cert) => (
+                <span 
+                  key={cert.id}
+                  className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm"
+                >
+                  {cert.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Metadata Card
+const MetadataCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 className="text-lg font-semibold mb-4">Job Metadata</h3>
+      
+      <div className="space-y-4">
+        <div className="flex items-center justify-between py-2 border-b border-gray-100">
+          <div className="flex items-center gap-2 text-gray-600">
+            <Calendar className="w-4 h-4" />
+            <span>Scraped At</span>
+          </div>
+          <span className="text-sm">{formatDate(job.scrapedAt)}</span>
+        </div>
+
+        <div className="flex items-center justify-between py-2 border-b border-gray-100">
+          <div className="flex items-center gap-2 text-gray-600">
+            <Calendar className="w-4 h-4" />
+            <span>Posted At</span>
+          </div>
+          <span className="text-sm">{formatDate(job.postedAt)}</span>
+        </div>
+
+        <div className="flex items-center justify-between py-2 border-b border-gray-100">
+          <div className="flex items-center gap-2 text-gray-600">
+            <Calendar className="w-4 h-4" />
+            <span>Valid Till</span>
+          </div>
+          <span className="text-sm">{formatDate(job.validTill)}</span>
+        </div>
+
+        <div className="flex items-center justify-between py-2 border-b border-gray-100">
+          <div className="flex items-center gap-2 text-gray-600">
+            <Database className="w-4 h-4" />
+            <span>Source</span>
+          </div>
+          <SourceBadge source={job.source} />
+        </div>
+
+        {job.externalJobId && (
+          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+            <div className="flex items-center gap-2 text-gray-600">
+              <Database className="w-4 h-4" />
+              <span>External Job ID</span>
+            </div>
+            <span className="text-sm font-mono text-gray-900">{job.externalJobId}</span>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between py-2">
+          <div className="flex items-center gap-2 text-gray-600">
+            <Eye className="w-4 h-4" />
+            <span>Status</span>
+          </div>
+          <StatusBadge status={job.status} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Action Buttons
+const ActionButtons: React.FC<{
+  jobId: string;
+  onEdit: () => void;
+  onDelete: () => void;
+}> = ({ jobId, onEdit, onDelete }) => {
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 className="text-lg font-semibold mb-4">Actions</h3>
+      <div className="flex flex-col gap-3">
+        <button
+          onClick={onEdit}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Edit className="w-5 h-5" />
+          Edit Job
+        </button>
+        <button
+          onClick={onDelete}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+        >
+          <Trash2 className="w-5 h-5" />
+          Delete Job
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // Main Component
-const ScrapedJobEditPage: React.FC = () => {
+const ScrapedJobDetailPage: React.FC = () => {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "";
   
   const [jobData, setJobData] = useState<ScrapedJobDetail | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  // Form state
-  const [formData, setFormData] = useState<UpdateScrapedJobDto>({
-    title: '',
-    description: '',
-    roleName: '',
-    categoryName: '',
-    workMode: 'ONSITE',
-    employmentType: 'FULL_TIME',
-    experience: 'MID',
-    companyName: '',
-    companyLogo: '',
-    companyWebsite: '',
-    companySize: '',
-    companyIndustry: '',
-    companyAbout: '',
-    location: {
-      city: '',
-      state: '',
-      country: '',
-    },
-    applyUrl: '',
-    skills: [],
-    certifications: [],
-    source: '',
-    externalJobId: '',
-    originalUrl: '',
-    validTill: '',
-  });
 
   const { loading, error, execute } = useApi({
     onSuccess: (response: ScrapedJobDetail) => {
       setJobData(response);
-      
-      // Populate form with existing data
-      setFormData({
-        title: response.title,
-        description: response.description,
-        roleName: response.role.name,
-        categoryName: response.role.category?.title || '',
-        workMode: response.workMode,
-        employmentType: response.employmentType,
-        experience: response.experience,
-        companyName: response.company.name,
-        companyLogo: response.company.logo || '',
-        companyWebsite: response.company.website || '',
-        companySize: response.company.size || '',
-        companyIndustry: response.company.industry || '',
-        companyAbout: response.company.about || '',
-        location: response.location ? {
-          city: response.location.city,
-          state: response.location.state,
-          country: response.location.country,
-        } : undefined,
-        applyUrl: response.applyUrl || '',
-        skills: response.skills.map(s => s.name),
-        certifications: response.certifications.map(c => c.name),
-        source: response.source,
-        externalJobId: response.externalJobId || '',
-        originalUrl: response.originalUrl || '',
-        validTill: response.validTill ? new Date(response.validTill).toISOString().split('T')[0] : '',
-      });
     }
   });
 
@@ -103,50 +445,19 @@ const ScrapedJobEditPage: React.FC = () => {
     }
   }, [id]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleEdit = () => {
+    window.location.href = `/admin/job-scraper/manage/${id}`;
   };
 
-  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      location: {
-        ...prev.location,
-        [name]: value
+  const handleDelete = async () => {
+    if (confirm('Are you sure you want to delete this scraped job? This action cannot be undone.')) {
+      try {
+        await scrapedJobService.deleteScrapedJob(id);
+        alert('Scraped Job Deleted!');
+        window.location.href = '/admin/job-scraper/manage';
+      } catch (error: any) {
+        alert(`Failed to delete: ${error.message}`);
       }
-    }));
-  };
-
-  const handleArrayChange = (field: 'skills' | 'certifications', value: string) => {
-    const items = value.split(',').map(item => item.trim()).filter(item => item.length > 0);
-    setFormData(prev => ({
-      ...prev,
-      [field]: items
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-
-    try {
-      await scrapedJobService.updateScrapedJob(id, formData);
-      alert('Scraped job updated successfully!');
-      window.location.href = `/admin/job-scraper/manage`;
-    } catch (error: any) {
-      alert(`Failed to update job: ${error.message}`);
-      setSaving(false);
-    }
-  };
-
-  const handleCancel = () => {
-    if (confirm('Are you sure you want to cancel? All unsaved changes will be lost.')) {
-      window.location.href = `/admin/job-scraper/manage`;
     }
   };
 
@@ -193,433 +504,25 @@ const ScrapedJobEditPage: React.FC = () => {
         </Link>
       </div>
 
-      <div className="max-w-7xl">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Edit Scraped Job</h1>
-
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
-          {/* Basic Information */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-gray-200">Basic Information</h2>
-            
-            <div className="space-y-4">
-              {/* Job Title */}
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                  Job Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., Senior Cybersecurity Analyst"
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                  Job Description <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  required
-                  rows={8}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Describe the job responsibilities, requirements, and qualifications..."
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Job Details */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-gray-200">Job Details</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Role Name */}
-              <div>
-                <label htmlFor="roleName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Role Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="roleName"
-                  name="roleName"
-                  value={formData.roleName}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., Security Analyst"
-                />
-              </div>
-
-              {/* Category Name */}
-              <div>
-                <label htmlFor="categoryName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Category Name
-                </label>
-                <input
-                  type="text"
-                  id="categoryName"
-                  name="categoryName"
-                  value={formData.categoryName}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., Cyber Security"
-                />
-              </div>
-
-              {/* Work Mode */}
-              <div>
-                <label htmlFor="workMode" className="block text-sm font-medium text-gray-700 mb-1">
-                  Work Mode <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="workMode"
-                  name="workMode"
-                  value={formData.workMode}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="REMOTE">Remote</option>
-                  <option value="ONSITE">Onsite</option>
-                  <option value="HYBRID">Hybrid</option>
-                </select>
-              </div>
-
-              {/* Employment Type */}
-              <div>
-                <label htmlFor="employmentType" className="block text-sm font-medium text-gray-700 mb-1">
-                  Employment Type <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="employmentType"
-                  name="employmentType"
-                  value={formData.employmentType}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="FULL_TIME">Full Time</option>
-                  <option value="PART_TIME">Part Time</option>
-                  <option value="CONTRACT">Contract</option>
-                  <option value="INTERNSHIP">Internship</option>
-                </select>
-              </div>
-
-              {/* Experience Level */}
-              <div>
-                <label htmlFor="experience" className="block text-sm font-medium text-gray-700 mb-1">
-                  Experience Level <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="experience"
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="ENTRY">Entry Level</option>
-                  <option value="MID">Mid Level</option>
-                  <option value="SENIOR">Senior Level</option>
-                  <option value="LEAD">Lead</option>
-                </select>
-              </div>
-
-              {/* Valid Till */}
-              <div>
-                <label htmlFor="validTill" className="block text-sm font-medium text-gray-700 mb-1">
-                  Valid Till
-                </label>
-                <input
-                  type="date"
-                  id="validTill"
-                  name="validTill"
-                  value={formData.validTill}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Company Information */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-gray-200">Company Information</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Company Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="companyName"
-                  name="companyName"
-                  value={formData.companyName}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="companyWebsite" className="block text-sm font-medium text-gray-700 mb-1">
-                  Company Website
-                </label>
-                <input
-                  type="url"
-                  id="companyWebsite"
-                  name="companyWebsite"
-                  value={formData.companyWebsite}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="https://example.com"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="companySize" className="block text-sm font-medium text-gray-700 mb-1">
-                  Company Size
-                </label>
-                <input
-                  type="text"
-                  id="companySize"
-                  name="companySize"
-                  value={formData.companySize}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., 1000-5000"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="companyIndustry" className="block text-sm font-medium text-gray-700 mb-1">
-                  Company Industry
-                </label>
-                <input
-                  type="text"
-                  id="companyIndustry"
-                  name="companyIndustry"
-                  value={formData.companyIndustry}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., Technology"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label htmlFor="companyAbout" className="block text-sm font-medium text-gray-700 mb-1">
-                  Company About
-                </label>
-                <textarea
-                  id="companyAbout"
-                  name="companyAbout"
-                  value={formData.companyAbout}
-                  onChange={handleInputChange}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Brief description about the company..."
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Location */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-gray-200">Location</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
-                  City
-                </label>
-                <input
-                  type="text"
-                  id="city"
-                  name="city"
-                  value={formData.location?.city || ''}
-                  onChange={handleLocationChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
-                  State
-                </label>
-                <input
-                  type="text"
-                  id="state"
-                  name="state"
-                  value={formData.location?.state || ''}
-                  onChange={handleLocationChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
-                  Country
-                </label>
-                <input
-                  type="text"
-                  id="country"
-                  name="country"
-                  value={formData.location?.country || ''}
-                  onChange={handleLocationChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Skills & Certifications */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-gray-200">Skills & Certifications</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="skills" className="block text-sm font-medium text-gray-700 mb-1">
-                  Skills (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  id="skills"
-                  name="skills"
-                  value={formData.skills?.join(', ')}
-                  onChange={(e) => handleArrayChange('skills', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., Python, AWS, Docker"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="certifications" className="block text-sm font-medium text-gray-700 mb-1">
-                  Certifications (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  id="certifications"
-                  name="certifications"
-                  value={formData.certifications?.join(', ')}
-                  onChange={(e) => handleArrayChange('certifications', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., CISSP, CEH, Security+"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Application & Source Info */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-gray-200">Application & Source Info</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="applyUrl" className="block text-sm font-medium text-gray-700 mb-1">
-                  Apply URL <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="url"
-                  id="applyUrl"
-                  name="applyUrl"
-                  value={formData.applyUrl}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="https://example.com/apply"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="source" className="block text-sm font-medium text-gray-700 mb-1">
-                  Source <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="source"
-                  name="source"
-                  value={formData.source}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., indeed, linkedin"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="externalJobId" className="block text-sm font-medium text-gray-700 mb-1">
-                  External Job ID
-                </label>
-                <input
-                  type="text"
-                  id="externalJobId"
-                  name="externalJobId"
-                  value={formData.externalJobId}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="originalUrl" className="block text-sm font-medium text-gray-700 mb-1">
-                  Original URL
-                </label>
-                <input
-                  type="url"
-                  id="originalUrl"
-                  name="originalUrl"
-                  value={formData.originalUrl}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-4 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={handleCancel}
-              disabled={saving}
-              className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              <X className="w-4 h-4" />
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {saving ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  Save Changes
-                </>
-              )}
-            </button>
-          </div>
-        </form>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <JobInfoCard job={jobData} />
+          <SkillsCertificationsCard job={jobData} />
+        </div>
+        
+        <div className="space-y-6">
+          <CompanyInfoCard job={jobData} />
+          <LocationRoleCard job={jobData} />
+          <MetadataCard job={jobData} />
+          <ActionButtons 
+            jobId={jobData.id}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </div>
       </div>
     </div>
   );
 };
 
-export default ScrapedJobEditPage;
+export default ScrapedJobDetailPage;
