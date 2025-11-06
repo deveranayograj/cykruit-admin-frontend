@@ -17,6 +17,8 @@ export interface User {
   suspendedAt: string | null;
   suspensionReason: string | null;
   lastLogin: string | null;
+  lastLoginIp: string | null;
+  registrationIp: string | null;
   createdAt: string;
   updatedAt: string;
   jobSeeker: JobSeeker | null;

@@ -89,6 +89,22 @@ export const UserInfoCard: React.FC<{ user: UserDetail }> = ({ user }) => {
           </div>
         </div>
 
+        <div className="flex items-start gap-3">
+          <UserIcon className="w-5 h-5 text-gray-400 mt-0.5" />
+          <div>
+            <p className="text-sm text-gray-500">Last IP Address</p>
+            <p className="font-medium text-gray-900">{user.lastLoginIp ?? 'Not available'}</p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <UserIcon className="w-5 h-5 text-gray-400 mt-0.5" />
+          <div>
+            <p className="text-sm text-gray-500">Registration IP</p>
+            <p className="font-medium text-gray-900">{user.registrationIp ?? 'Not available'}</p>
+          </div>
+        </div>
+
         {user.suspensionReason && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-start gap-2">
