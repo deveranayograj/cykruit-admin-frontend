@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -16,7 +16,7 @@ const Breadcrumb: React.FC = () => {
       <ChevronRight className="w-4 h-4" />
       <Link href="/admin/dashboard" className="hover:text-gray-900">Admin Dashboard</Link>
       <ChevronRight className="w-4 h-4" />
-      <Link href="/admin/job-scraper/manage" className="hover:text-gray-900">Scraped Jobs Management</Link>
+      <Link href="/admin/job-scraper/manage" className="hover:text-gray-900">Scraped Jobs</Link>
       <ChevronRight className="w-4 h-4" />
       <span className="text-gray-900 font-medium">Generate Jobs</span>
     </nav>
@@ -31,6 +31,9 @@ const GeneratedJobRow: React.FC<{
   isInserting: boolean;
   insertStatus: 'idle' | 'success' | 'error';
 }> = ({ job, index, onInsert, isInserting, insertStatus }) => {
+  const handelLinkClick = () => {
+    window.open(job.originalUrl, '_blank');
+  };
   return (
     <tr className="hover:bg-gray-50 transition-colors">
       <td className="px-6 py-4 text-sm text-gray-900">
@@ -38,7 +41,12 @@ const GeneratedJobRow: React.FC<{
       </td>
       <td className="px-6 py-4">
         <div>
-          <div className="font-medium text-gray-900">{job.title}</div>
+          <div className="font-medium text-gray-900"><button
+            onClick={() => handelLinkClick()}
+            className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer text-left"
+          >
+            {job.title}
+          </button></div>
           <div className="text-xs text-gray-500 mt-1">{job.roleName}</div>
         </div>
       </td>
@@ -125,14 +133,14 @@ const GenerateJobsPage: React.FC = () => {
     setFailedJobIds(new Set());
 
     try {
-      const jobs = await scrapedJobService.generateJobs({
+      const response = await scrapedJobService.generateJobs({
         source,
         category,
         count,
       });
 
       // Add temporary IDs for tracking
-      const jobsWithIds = jobs.map((job, index) => ({
+      const jobsWithIds = response.jobs.map((job, index) => ({
         ...job,
         _tempId: `temp-${Date.now()}-${index}`,
       }));
@@ -145,14 +153,45 @@ const GenerateJobsPage: React.FC = () => {
     }
   };
 
+  // Convert GeneratedJob to CreateScrapedJobDto format
+  const convertToCreateDto = (job: GeneratedJob): CreateScrapedJobDto => {
+    // Map "OFFICE" to "ONSITE" for backend compatibility
+    const workMode = job.workMode === 'OFFICE' ? 'ONSITE' : job.workMode;
+
+    return {
+      title: job.title,
+      description: job.description,
+      roleName: job.roleName,
+      categoryName: job.categoryName,
+      workMode: workMode as 'REMOTE' | 'ONSITE' | 'HYBRID',
+      employmentType: job.employmentType as 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP',
+      experience: job.experience as 'ENTRY' | 'MID' | 'SENIOR' | 'LEAD',
+      companyName: job.companyName,
+      companyLogo: job.companyLogo || undefined,
+      companyWebsite: job.companyWebsite || undefined,
+      companyIndustry: job.companyIndustry,
+      location: {
+        city: job.location.city,
+        state: job.location.state,
+        country: job.location.country,
+      },
+      applyUrl: job.applyUrl,
+      skills: job.skills,
+      source: job.source,
+      externalJobId: job.externalJobId,
+      originalUrl: job.originalUrl,
+    };
+  };
+
   // Handle Single Insert
   const handleInsertSingle = async (job: GeneratedJob) => {
     const tempId = job._tempId!;
     setInsertingJobIds(prev => new Set(prev).add(tempId));
 
     try {
-      const result = await scrapedJobService.createScrapedJob(job);
-      
+      const jobDto = convertToCreateDto(job);
+      const result = await scrapedJobService.createScrapedJob(jobDto);
+
       if (result.success) {
         setInsertedJobIds(prev => new Set(prev).add(tempId));
         alert(`Job "${job.title}" inserted successfully!`);
@@ -181,8 +220,11 @@ const GenerateJobsPage: React.FC = () => {
     setIsBulkInserting(true);
 
     try {
+      // Convert all jobs to CreateScrapedJobDto format
+      const jobDtos = generatedJobs.map(job => convertToCreateDto(job));
+
       const result = await scrapedJobService.bulkCreateScrapedJobs({
-        jobs: generatedJobs,
+        jobs: jobDtos,
       });
 
       alert(
@@ -222,7 +264,7 @@ const GenerateJobsPage: React.FC = () => {
       <Breadcrumb />
 
       <div className="mb-6">
-        <Link 
+        <Link
           href="/admin/job-scraper/manage"
           className="text-blue-600 hover:text-blue-800 text-sm font-medium"
         >
@@ -235,7 +277,7 @@ const GenerateJobsPage: React.FC = () => {
       {/* Generation Form */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Generation Parameters</h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           {/* Source */}
           <div>
@@ -248,10 +290,9 @@ const GenerateJobsPage: React.FC = () => {
               onChange={(e) => setSource(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="ai">AI Generated</option>
+              <option value="naukri">Naukri</option>
               <option value="indeed">Indeed</option>
               <option value="linkedin">LinkedIn</option>
-              <option value="glassdoor">Glassdoor</option>
             </select>
           </div>
 

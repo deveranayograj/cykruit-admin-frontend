@@ -10,6 +10,7 @@ import {
   ScrapedJobActionResponse,
   BulkCreateResponse,
   GenerateJobsRequest,
+  GenerateJobsResponse,
 } from "@/types/scraped-job";
 
 // Generic API response type (matching backend structure)
@@ -101,10 +102,9 @@ export const scrapedJobService = {
   },
 
   // ✅ Generate Jobs (AI/Mock)
-  async generateJobs(params: GenerateJobsRequest): Promise<CreateScrapedJobDto[]> {
-    const response = await apiClient.get<ApiResponse<CreateScrapedJobDto[]>>(
-      API_ENDPOINTS.SCRAPER_JOB_GENERATE,
-      params
+  async generateJobs(params: GenerateJobsRequest): Promise<GenerateJobsResponse> {
+    const response = await apiClient.get<ApiResponse<GenerateJobsResponse>>(
+      `${API_ENDPOINTS.SCRAPER_JOB_GENERATE}?source=${params.source}&category=${encodeURIComponent(params.category)}&count=${params.count}`
     );
     return response.data;
   },

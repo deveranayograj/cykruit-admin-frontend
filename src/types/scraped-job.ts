@@ -139,7 +139,37 @@ export interface GenerateJobsRequest {
   count: number;
 }
 
-export interface GeneratedJob extends CreateScrapedJobDto {
-  _tempId?: string;
-  _selected?: boolean;
+export interface GenerateJobsResponse {
+  success: boolean;
+  source: string;
+  category: string;
+  count: number;
+  jobs: GeneratedJob[];
+  message: string;
+}
+
+export interface GeneratedJob {
+  title: string;
+  description: string;
+  companyName: string;
+  companyLogo: string | null;
+  companyWebsite: string | null;
+  companyIndustry: string;
+  workMode: string; // Note: Backend returns "OFFICE" instead of "ONSITE"
+  employmentType: string;
+  experience: string;
+  location: {
+    city: string;
+    state: string;
+    country: string;
+  };
+  roleName: string;
+  categoryName: string;
+  skills: string[];
+  applyUrl: string;
+  source: string;
+  externalJobId: string;
+  originalUrl: string;
+  scrapedAt: string;
+  _tempId?: string; // Client-side only
 }
