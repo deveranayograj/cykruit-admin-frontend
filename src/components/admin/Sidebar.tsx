@@ -15,12 +15,18 @@ import {
   CheckCircle,
   XCircle,
   Flag,
-  Star,
+  Download,
   Archive,
   Award,
   Wrench,
   CircleUserRound,
-  ChartBarStacked
+  ChartBarStacked,
+  ClockFading,
+  FilePenLine,
+  UserSearch,
+  UserPlus,
+  ArchiveRestore,
+  Sparkles
 } from "lucide-react";
 
 export interface NavItem {
@@ -39,11 +45,7 @@ export const Sidebar: React.FC<{
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [expandedItems, setExpandedItems] = useState<string[]>([
-    "Users",
-    "Employers",
-    "KYC",
-  ]);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   const [activePath, setActivePath] = useState<string>("");
 
@@ -66,8 +68,8 @@ export const Sidebar: React.FC<{
       path: '/admin/users',
       children: [
         { label: 'All Users', icon: null, path: '/admin/users' },
-        { label: 'Job Seekers', icon: null, path: '/admin/users?role=SEEKER' },
-        { label: 'Employers', icon: null, path: '/admin/users?role=EMPLOYER' }
+        { label: 'Job Seekers', icon: <UserSearch className="w-4 h-4" />, path: '/admin/users?role=SEEKER' },
+        { label: 'Employers', icon: <UserPlus className="w-4 h-4" />, path: '/admin/users?role=EMPLOYER' }
       ]
     },
     {
@@ -91,6 +93,15 @@ export const Sidebar: React.FC<{
       ]
     },
     {
+      label: 'Job scraping',
+      icon: <Download className="w-5 h-5" />,
+      path: '/admin/job-scraper',
+      children: [
+        { label: 'Scraped Jobs', icon: <ArchiveRestore className="w-4 h-4" />, path: '/admin/job-scraper/manage' },
+        { label: 'Generate Jobs', icon: <Sparkles className="w-4 h-4" />, path: '/admin/job-scraper/generate' },
+      ]
+    },
+    {
       label: 'Jobs',
       icon: <Briefcase className="w-5 h-5" />,
       path: '/admin/jobs',
@@ -98,8 +109,8 @@ export const Sidebar: React.FC<{
         { label: 'All Jobs', icon: null, path: '/admin/jobs' },
         { label: 'Pending Approval', icon: <AlertCircle className="w-4 h-4" />, path: '/admin/jobs?status=pending' },
         { label: 'Active', icon: <CheckCircle className="w-4 h-4" />, path: '/admin/jobs?status=active' },
-        { label: 'Draft', icon: null, path: '/admin/jobs?status=draft' },
-        { label: 'Expired', icon: null, path: '/admin/jobs?status=expired' },
+        { label: 'Draft', icon: <FilePenLine className="w-4 h-4" />, path: '/admin/jobs?status=draft' },
+        { label: 'Expired', icon: <ClockFading className="w-4 h-4" />, path: '/admin/jobs?status=expired' },
         { label: 'Archived', icon: <Archive className="w-4 h-4" />, path: '/admin/jobs?status=archived' },
       ]
     },

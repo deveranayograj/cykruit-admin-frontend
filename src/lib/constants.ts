@@ -25,9 +25,14 @@ export const API_ENDPOINTS = {
   // Jobs
   JOBS_LIST: '/jobs',
   JOB_DETAIL: (id: string) => `/jobs/${id}`,
-  JOB_APPROVE: (id: string) => `/jobs/${id}/approve`,
-  JOB_REJECT: (id: string) => `/jobs/${id}/reject`,
 
+  // Jobs-scraper
+  SCRAPER_JOBS: '/scraper/jobs',
+  SCRAPER_JOB_DETAIL: (id: string) => `/scraper/jobs/${id}`,
+  SCRAPER_JOBS_BULK: '/scraper/jobs/bulk',
+  SCRAPER_JOB_GENERATE: '/scraper/jobs/generate',
+  
+  
   // Dashboard
   DASHBOARD_OVERVIEW: '/dashboard/overview',
   DASHBOARD_RECENT_ACTIVITY: '/dashboard/recent-activity',
