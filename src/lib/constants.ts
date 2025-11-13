@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
   KYC_DETAIL: (id: string) => `/kyc-review/${id}`,
   KYC_APPROVE: () => `/kyc-review/approve`,
   KYC_REJECT: () => `/kyc-review/reject`,
+  KYC_DOCUMENT: (id: string, docType: string) => `/kyc-review/${id}/document/${docType}`,
 
   // Users
   USERS_LIST: '/users',

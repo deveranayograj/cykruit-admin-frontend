@@ -134,4 +134,15 @@ export const kycService = {
     );
     return response.data; // ✅ unwrap
   },
+
+  // =============================
+  // NEW — Get signed document URL
+  // =============================
+  async getKycDocument(kycId: string, docType: string) {
+    const response = await apiClient.get<
+      ApiResponse<{ url: string; fileName: string }>
+    >(API_ENDPOINTS.KYC_DOCUMENT(kycId, docType));
+
+    return response.data; // unwrap { url, fileName }
+  },
 };

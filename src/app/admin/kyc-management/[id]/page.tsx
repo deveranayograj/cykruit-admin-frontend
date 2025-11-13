@@ -16,7 +16,7 @@ import { useApi } from "@/hooks/useApi";
 const KYCDetailPage: React.FC = () => {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "";
-  
+
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null);
   const [kycData, setKycData] = useState<KYCDetail | null>(null);
 
@@ -42,7 +42,7 @@ const KYCDetailPage: React.FC = () => {
     }
   };
 
-  const handleReject = async (reason: string, recordId: string,  remarks: string) => {
+  const handleReject = async (reason: string, recordId: string, remarks: string) => {
     try {
       const result = await kycService.rejectKYC(recordId, reason, remarks);
       alert(`KYC Rejected. New KYC ID: ${result.newKycId}`);
@@ -55,7 +55,7 @@ const KYCDetailPage: React.FC = () => {
   // Convert backend document URLs to DocumentItem format
   const getDocuments = (kyc: KYCDetail): DocumentItem[] => {
     const docs: DocumentItem[] = [];
-    
+
     if (kyc.panCardUrl) {
       docs.push({
         id: 'pan',
@@ -66,7 +66,7 @@ const KYCDetailPage: React.FC = () => {
         pageCount: kyc.panCardUrl.endsWith('.pdf') ? 1 : undefined
       });
     }
-    
+
     if (kyc.incorporationCertUrl) {
       docs.push({
         id: 'incorporation',
@@ -77,7 +77,7 @@ const KYCDetailPage: React.FC = () => {
         pageCount: kyc.incorporationCertUrl.endsWith('.pdf') ? 1 : undefined
       });
     }
-    
+
     if (kyc.gstCertUrl) {
       docs.push({
         id: 'gst',
@@ -88,22 +88,39 @@ const KYCDetailPage: React.FC = () => {
         pageCount: kyc.gstCertUrl.endsWith('.pdf') ? 1 : undefined
       });
     }
-    
+
     if (kyc.otherDocs && Array.isArray(kyc.otherDocs)) {
-      kyc.otherDocs.forEach((url, index) => {
+      kyc.otherDocs.forEach((key, index) => {
+        const isPdf = key.toLowerCase().endsWith('.pdf');
+
         docs.push({
           id: `other-${index}`,
           name: `Other Document ${index + 1}`,
-          type: url.endsWith('.pdf') ? 'pdf' : 'image',
-          url: url,
-          thumbnail: url,
-          pageCount: url.endsWith('.pdf') ? 1 : undefined
+          type: isPdf ? 'pdf' : 'image',
+          url: key, // raw key (not used for loading)
+          thumbnail: key,
+          pageCount: isPdf ? 1 : undefined
         });
       });
     }
-    
     return docs;
   };
+
+  const handleOpenDocument = async (doc: DocumentItem) => {
+    if (!kycData) return;
+    try {
+      const res = await kycService.getKycDocument(kycData.id, doc.id);
+
+      // Update only the URL (replace S3 key with signed URL)
+      setSelectedDocument({
+        ...doc,
+        url: res.url, // signed URL
+      });
+    } catch (error: any) {
+      alert(error?.message || 'Failed to open KYC document');
+    }
+  };
+
 
   if (loading) {
     return (
@@ -145,9 +162,9 @@ const KYCDetailPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <CompanyInfoCard data={kycData} />
-        <DocumentsCard 
-          documents={documents} 
-          onDocumentClick={setSelectedDocument} 
+        <DocumentsCard
+          documents={documents}
+          onDocumentClick={handleOpenDocument}
         />
       </div>
 
