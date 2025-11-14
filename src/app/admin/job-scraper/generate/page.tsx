@@ -290,8 +290,8 @@ const GenerateJobsPage: React.FC = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="naukri">Naukri</option>
-              <option value="indeed">Indeed</option>
-              <option value="linkedin">LinkedIn</option>
+              <option value="monster">Monster</option>
+              <option value="timesjobs">Times Job</option>
             </select>
           </div>
 
