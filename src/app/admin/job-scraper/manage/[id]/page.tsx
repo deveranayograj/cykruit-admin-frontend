@@ -7,8 +7,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  ChevronRight, Building2, MapPin, Briefcase, Clock, 
+import {
+  ChevronRight, Building2, MapPin, Briefcase, Clock,
   Users, Eye, Calendar, Edit, Trash2, Database, Link as LinkIcon,
   Award, Code
 } from 'lucide-react';
@@ -79,6 +79,44 @@ const JobInfoCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
     });
   };
 
+  // Sanitize and fix HTML structure
+  const sanitizeAndFixHTML = (html: string): string => {
+    // Remove dangerous tags and attributes
+    let sanitized = html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+      .replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '') // Remove event handlers
+      .replace(/javascript:/gi, '');
+
+    // Fix orphaned <li> tags by wrapping them in <ul>
+    sanitized = sanitized.replace(/(<li>[\s\S]*?<\/li>)/gi, (match) => {
+      // Check if <li> is already inside <ul> or <ol>
+      const beforeLi = sanitized.substring(0, sanitized.indexOf(match));
+      const afterLi = sanitized.substring(sanitized.indexOf(match) + match.length);
+
+      // Count open <ul>/<ol> tags before this <li>
+      const openUl = (beforeLi.match(/<ul[^>]*>/gi) || []).length;
+      const closeUl = (beforeLi.match(/<\/ul>/gi) || []).length;
+      const openOl = (beforeLi.match(/<ol[^>]*>/gi) || []).length;
+      const closeOl = (beforeLi.match(/<\/ol>/gi) || []).length;
+
+      // If <li> is not inside a list, wrap it
+      if (openUl === closeUl && openOl === closeOl) {
+        return `<ul style="list-style-type: disc; padding-left: 2rem;">${match}</ul>`;
+      }
+      return match;
+    });
+
+    // Ensure all <ul> and <ol> have proper styling
+    sanitized = sanitized.replace(/<ul>/gi, '<ul style="list-style-type: disc; padding-left: 2rem; margin: 1rem 0;">');
+    sanitized = sanitized.replace(/<ol>/gi, '<ol style="list-style-type: decimal; padding-left: 2rem; margin: 1rem 0;">');
+
+    // Add display: list-item to all <li> tags
+    sanitized = sanitized.replace(/<li>/gi, '<li style="display: list-item; margin-bottom: 0.5rem;">');
+
+    return sanitized;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <div className="flex items-start justify-between mb-6">
@@ -134,9 +172,77 @@ const JobInfoCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
 
       <div className="border-t border-gray-200 pt-6">
         <h3 className="text-lg font-semibold mb-4">Job Description</h3>
-        <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
-          {job.description}
-        </div>
+        {/* 🔥 RENDER HTML INSTEAD OF PLAIN TEXT */}
+        <div
+          className="job-description text-gray-700"
+          dangerouslySetInnerHTML={{ __html: sanitizeAndFixHTML(job.description) }}
+          style={{
+            lineHeight: '1.6',
+          }}
+        />
+
+        {/* Add custom CSS for better formatting */}
+        <style jsx>{`
+          .job-description :global(ul),
+          .job-description :global(ol) {
+            list-style-position: outside !important;
+            padding-left: 2rem !important;
+            margin: 1rem 0 !important;
+          }
+          
+          .job-description :global(ul) {
+            list-style-type: disc !important;
+          }
+          
+          .job-description :global(ol) {
+            list-style-type: decimal !important;
+          }
+          
+          .job-description :global(li) {
+            display: list-item !important;
+            margin-bottom: 0.5rem !important;
+            margin-left: 0 !important;
+          }
+          
+          .job-description :global(p) {
+            margin-bottom: 1rem;
+          }
+          
+          .job-description :global(h1),
+          .job-description :global(h2),
+          .job-description :global(h3),
+          .job-description :global(h4) {
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+          }
+          
+          .job-description :global(h2) {
+            font-size: 1.25rem;
+            color: #1f2937;
+          }
+          
+          .job-description :global(b),
+          .job-description :global(strong) {
+            font-weight: 600;
+            color: #1f2937;
+          }
+          
+          .job-description :global(br) {
+            display: block;
+            content: "";
+            margin-top: 0.5rem;
+          }
+          
+          /* Force list items to show bullets even with inline styles */
+          .job-description :global(ul li) {
+            list-style-type: disc !important;
+          }
+          
+          .job-description :global(ol li) {
+            list-style-type: decimal !important;
+          }
+        `}</style>
       </div>
 
       {job.applyUrl && (
@@ -145,9 +251,9 @@ const JobInfoCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
             <LinkIcon className="w-4 h-4" />
             <span className="font-medium">Application Link:</span>
           </div>
-          <a 
-            href={job.applyUrl} 
-            target="_blank" 
+          <a
+            href={job.applyUrl}
+            target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-800 text-sm break-all"
           >
@@ -162,9 +268,9 @@ const JobInfoCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
             <LinkIcon className="w-4 h-4" />
             <span className="font-medium">Original Source URL:</span>
           </div>
-          <a 
-            href={job.originalUrl} 
-            target="_blank" 
+          <a
+            href={job.originalUrl}
+            target="_blank"
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-gray-800 text-sm break-all"
           >
@@ -181,12 +287,12 @@ const CompanyInfoCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h3 className="text-lg font-semibold mb-4">Company Information</h3>
-      
+
       <div className="space-y-4">
         {job.company.logo && (
           <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg">
-            <img 
-              src={job.company.logo} 
+            <img
+              src={job.company.logo}
               alt={job.company.name}
               className="max-h-20 object-contain"
             />
@@ -202,7 +308,7 @@ const CompanyInfoCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
           {job.company.website && (
             <div>
               <div className="text-sm text-gray-500">Website</div>
-              <a 
+              <a
                 href={job.company.website}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -244,7 +350,7 @@ const LocationRoleCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h3 className="text-lg font-semibold mb-4">Location & Role</h3>
-      
+
       <div className="space-y-4">
         {job.location && (
           <div>
@@ -283,7 +389,7 @@ const SkillsCertificationsCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h3 className="text-lg font-semibold mb-4">Skills & Certifications</h3>
-      
+
       <div className="space-y-4">
         {job.skills && job.skills.length > 0 && (
           <div>
@@ -293,7 +399,7 @@ const SkillsCertificationsCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) 
             </div>
             <div className="flex flex-wrap gap-2">
               {job.skills.map((skill) => (
-                <span 
+                <span
                   key={skill.id}
                   className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
                 >
@@ -312,7 +418,7 @@ const SkillsCertificationsCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) 
             </div>
             <div className="flex flex-wrap gap-2">
               {job.certifications.map((cert) => (
-                <span 
+                <span
                   key={cert.id}
                   className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm"
                 >
@@ -343,7 +449,7 @@ const MetadataCard: React.FC<{ job: ScrapedJobDetail }> = ({ job }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h3 className="text-lg font-semibold mb-4">Job Metadata</h3>
-      
+
       <div className="space-y-4">
         <div className="flex items-center justify-between py-2 border-b border-gray-100">
           <div className="flex items-center gap-2 text-gray-600">
@@ -432,7 +538,7 @@ const ActionButtons: React.FC<{
 const ScrapedJobDetailPage: React.FC = () => {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "";
-  
+
   const [jobData, setJobData] = useState<ScrapedJobDetail | null>(null);
 
   const { loading, error, execute } = useApi({
@@ -498,7 +604,7 @@ const ScrapedJobDetailPage: React.FC = () => {
       <Breadcrumb jobTitle={jobData.title} />
 
       <div className="mb-6">
-        <Link 
+        <Link
           href="/admin/job-scraper/manage"
           className="text-blue-600 hover:text-blue-800 text-sm font-medium"
         >
@@ -512,12 +618,12 @@ const ScrapedJobDetailPage: React.FC = () => {
           <SkillsCertificationsCard job={jobData} />
           <LocationRoleCard job={jobData} />
         </div>
-        
+
         <div className="space-y-6">
           <CompanyInfoCard job={jobData} />
-          
+
           <MetadataCard job={jobData} />
-          <ActionButtons 
+          <ActionButtons
             jobId={jobData.id}
             onEdit={handleEdit}
             onDelete={handleDelete}
