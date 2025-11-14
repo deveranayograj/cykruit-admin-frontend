@@ -24,7 +24,8 @@ import {
   UserSearch,
   UserPlus,
   ArchiveRestore,
-  Sparkles
+  Sparkles,
+  MessageSquare
 } from "lucide-react";
 
 export interface NavItem {
@@ -43,7 +44,7 @@ export const Sidebar: React.FC<{
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [expandedItems, setExpandedItems] = useState<string[]>(["Meta"]);
 
   const [activePath, setActivePath] = useState<string>("");
 
@@ -104,7 +105,7 @@ export const Sidebar: React.FC<{
       ]
     },
     {
-      label: 'Categories',
+      label: 'Meta',
       icon: <FolderTree className="w-5 h-5" />,
       path: '/admin/categories',
       children: [
@@ -113,7 +114,12 @@ export const Sidebar: React.FC<{
         { label: 'Job Categories', icon: <ChartBarStacked className="w-4 h-4" />, path: '/admin/categories/job-categories' },
         { label: 'Roles', icon: <CircleUserRound className="w-4 h-4" />, path: '/admin/categories/roles' },
       ]
-    }
+    },
+    {
+      label: 'Contact Forms',
+      icon: <MessageSquare className="w-5 h-5" />,
+      path: '/admin/contact-forms'
+    },
   ];
 
   // Auto-expand parent if active path matches any child
