@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/services/categoryService.ts
 
 import { apiClient } from "@/lib/api";
@@ -16,7 +17,47 @@ import {
   Role,
   CreateRoleDto,
   UpdateRoleDto,
+  Institute,
+  CreateInstituteDto,
+  UpdateInstituteDto,
 } from "@/types/categories";
+
+// ============================================
+// INSTITUTES SERVICE
+// ============================================
+export const institutesService = {
+  async getAll(params?: { page?: number; pageSize?: number; filter?: string; sort?: string; }) {
+    const query: string[] = [];
+    if (params?.page) query.push(`page=${params.page}`);
+    if (params?.pageSize) query.push(`pageSize=${params.pageSize}`);
+    if (params?.filter) query.push(`filter=${encodeURIComponent(params.filter)}`);
+    if (params?.sort) query.push(`sort=${encodeURIComponent(params.sort)}`);
+
+    const url = `${API_ENDPOINTS.META_INSTITUTES_LIST}${query.length ? `?${query.join('&')}` : ''}`;
+    const response = await apiClient.get<ApiResponse<any>>(url);
+    return response.data;
+  },
+
+  async create(data: CreateInstituteDto): Promise<Institute> {
+    const response = await apiClient.post<ApiResponse<Institute>>(API_ENDPOINTS.META_INSTITUTE_CREATE, data);
+    return response.data;
+  },
+
+  async update(id: string, data: UpdateInstituteDto): Promise<Institute> {
+    const response = await apiClient.put<ApiResponse<Institute>>(API_ENDPOINTS.META_INSTITUTE_UPDATE(id), data);
+    return response.data;
+  },
+
+  async verify(id: string, isVerified: boolean): Promise<Institute> {
+    const response = await apiClient.put<ApiResponse<Institute>>(API_ENDPOINTS.META_INSTITUTE_VERIFY(id), { isVerified });
+    return response.data;
+  },
+
+  async delete(id: string): Promise<void> {
+    await apiClient.delete<ApiResponse<void>>(API_ENDPOINTS.META_INSTITUTE_DELETE(id));
+  },
+};
+
 
 // ============================================
 // SKILLS SERVICE
@@ -71,7 +112,10 @@ export const certificationsService = {
     return response.data;
   },
 
-  async update(id: string, data: UpdateCertificationDto): Promise<Certification> {
+  async update(
+    id: string,
+    data: UpdateCertificationDto
+  ): Promise<Certification> {
     const response = await apiClient.put<ApiResponse<Certification>>(
       API_ENDPOINTS.META_CERTIFICATION_UPDATE(id),
       data

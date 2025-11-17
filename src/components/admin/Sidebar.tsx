@@ -25,7 +25,8 @@ import {
   UserPlus,
   ArchiveRestore,
   Sparkles,
-  MessageSquare
+  MessageSquare,
+  School
 } from "lucide-react";
 
 export interface NavItem {
@@ -109,6 +110,7 @@ export const Sidebar: React.FC<{
       icon: <FolderTree className="w-5 h-5" />,
       path: '/admin/categories',
       children: [
+        { label: 'Institutes', icon: <School className="w-4 h-4" />, path: '/admin/categories/institutes' },
         { label: 'Skills Library', icon: <Wrench className="w-4 h-4" />, path: '/admin/categories/skills' },
         { label: 'Certifications', icon: <Award className="w-4 h-4" />, path: '/admin/categories/certifications' },
         { label: 'Job Categories', icon: <ChartBarStacked className="w-4 h-4" />, path: '/admin/categories/job-categories' },

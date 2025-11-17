@@ -67,6 +67,13 @@ export const API_ENDPOINTS = {
   META_JOB_CATEGORY_UPDATE: (id: string) => `/meta/job-categories/${id}`,
   META_JOB_CATEGORY_DELETE: (id: string) => `/meta/job-categories/${id}`,
 
+  // 🧩 Institutes
+  META_INSTITUTES_LIST: "/meta/institutes",
+  META_INSTITUTE_CREATE: "/meta/institutes",
+  META_INSTITUTE_UPDATE: (id: string) => `/meta/institutes/${id}`,
+  META_INSTITUTE_DELETE: (id: string) => `/meta/institutes/${id}`,
+  META_INSTITUTE_VERIFY: (id: string) => `/meta/institutes/${id}/verify`,
+
   CONTACT_FORMS_LIST: "/contact-forms",
   CONTACT_FORM_STATUS: (id: string) => `/contact-forms/${id}/status`,
 };

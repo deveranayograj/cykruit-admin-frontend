@@ -10,6 +10,41 @@ export interface ApiResponse<T> {
 }
 
 // ============================================
+// INSTITUTES
+// ============================================
+export interface Institute {
+  id: string;
+  name: string;
+  area?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  type?: string | null;
+  isVerified: boolean;
+  usageCount?: number;
+  createdAt?: string;
+}
+
+export interface CreateInstituteDto {
+  name: string;
+  area?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  type?: string | null;
+}
+
+export interface UpdateInstituteDto {
+  name?: string;
+  area?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  type?: string | null;
+  isVerified?: boolean;
+}
+
+// ============================================
 // SKILLS
 // ============================================
 export interface Skill {
@@ -89,7 +124,11 @@ export interface UpdateRoleDto {
 // ============================================
 // GENERIC CATEGORY TYPES
 // ============================================
-export type CategoryType = 'skills' | 'certifications' | 'job-categories' | 'roles';
+export type CategoryType =
+  | "skills"
+  | "certifications"
+  | "job-categories"
+  | "roles";
 
 export interface CategoryConfig {
   type: CategoryType;
