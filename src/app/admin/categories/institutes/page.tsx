@@ -29,6 +29,9 @@ const InstitutesPage = () => {
 
     const [filter, setFilter] = useState<"all" | "verified" | "unverified">("all");
     const [sort, setSort] = useState<'name_asc' | 'name_desc' | 'usageCount_desc' | 'createdAt_asc' | 'createdAt_desc'>('createdAt_desc');
+    const [sortByCreator, setSortByCreator] =
+        useState<"jobseeker" | "admin" | "other" | "">("");
+
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [formMode, setFormMode] = useState<"create" | "edit">("create");
@@ -73,13 +76,14 @@ const InstitutesPage = () => {
                 pageSize,
                 filter,
                 sort,
+                sortByCreator,
             })
         );
     };
 
     useEffect(() => {
         loadInstitutes();
-    }, [page, pageSize, filter, sort]);
+    }, [page, pageSize, filter, sort, sortByCreator]);
 
     // local search across current page (client side)
     const filteredList = institutes.filter((ins) =>
@@ -206,6 +210,26 @@ const InstitutesPage = () => {
 
                         {/* Filters & Sort */}
                         <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <select
+                                    value={sortByCreator}
+                                    onChange={(e) => {
+                                        setSortByCreator(e.target.value as any);
+                                        setPage(1);
+                                    }}
+                                    className="border py-2 pl-3 pr-9 rounded appearance-none"
+                                >
+                                    <option value="">Sort by Creator</option>
+                                    <option value="jobseeker">Jobseeker First</option>
+                                    <option value="admin">Admin First</option>
+                                    <option value="other">Other First</option>
+                                </select>
+                                <ChevronDown
+                                    size={18}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none"
+                                />
+                            </div>
+
                             <div className="relative">
                                 <select
                                     value={filter}

@@ -26,12 +26,15 @@ import {
 // INSTITUTES SERVICE
 // ============================================
 export const institutesService = {
-  async getAll(params?: { page?: number; pageSize?: number; filter?: string; sort?: string; }) {
+  async getAll(params?: { page?: number; pageSize?: number; filter?: string; sort?: string; sortByCreator?: string; }) {
     const query: string[] = [];
     if (params?.page) query.push(`page=${params.page}`);
     if (params?.pageSize) query.push(`pageSize=${params.pageSize}`);
     if (params?.filter) query.push(`filter=${encodeURIComponent(params.filter)}`);
     if (params?.sort) query.push(`sort=${encodeURIComponent(params.sort)}`);
+    if (params?.sortByCreator)
+    query.push(`sortByCreator=${encodeURIComponent(params.sortByCreator)}`);
+
 
     const url = `${API_ENDPOINTS.META_INSTITUTES_LIST}${query.length ? `?${query.join('&')}` : ''}`;
     const response = await apiClient.get<ApiResponse<any>>(url);
