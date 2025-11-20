@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from "@/lib/api";
 import { API_ENDPOINTS } from "@/lib/constants";
 import {
@@ -54,7 +55,9 @@ export const scrapedJobService = {
 
     const url = `${API_ENDPOINTS.SCRAPER_JOBS}?${query.join("&")}`;
 
-    const response = await apiClient.get<ApiResponse<ScrapedJobsListResponse>>(url);
+    const response = await apiClient.get<ApiResponse<ScrapedJobsListResponse>>(
+      url
+    );
     return response.data;
   },
 
@@ -67,16 +70,19 @@ export const scrapedJobService = {
   },
 
   // ✅ Create single scraped job
-  async createScrapedJob(data: CreateScrapedJobDto): Promise<ScrapedJobActionResponse> {
-    const response = await apiClient.post<ApiResponse<ScrapedJobActionResponse>>(
-      API_ENDPOINTS.SCRAPER_JOBS,
-      data
-    );
+  async createScrapedJob(
+    data: CreateScrapedJobDto
+  ): Promise<ScrapedJobActionResponse> {
+    const response = await apiClient.post<
+      ApiResponse<ScrapedJobActionResponse>
+    >(API_ENDPOINTS.SCRAPER_JOBS, data);
     return response.data;
   },
 
   // ✅ Bulk create scraped jobs
-  async bulkCreateScrapedJobs(data: BulkCreateScrapedJobsDto): Promise<BulkCreateResponse> {
+  async bulkCreateScrapedJobs(
+    data: BulkCreateScrapedJobsDto
+  ): Promise<BulkCreateResponse> {
     const response = await apiClient.post<ApiResponse<BulkCreateResponse>>(
       API_ENDPOINTS.SCRAPER_JOBS_BULK,
       data
@@ -85,7 +91,10 @@ export const scrapedJobService = {
   },
 
   // ✅ Update Scraped Job
-  async updateScrapedJob(id: string, data: UpdateScrapedJobDto): Promise<ScrapedJobActionResponse> {
+  async updateScrapedJob(
+    id: string,
+    data: UpdateScrapedJobDto
+  ): Promise<ScrapedJobActionResponse> {
     const response = await apiClient.put<ApiResponse<ScrapedJobActionResponse>>(
       API_ENDPOINTS.SCRAPER_JOB_DETAIL(id),
       data
@@ -95,17 +104,29 @@ export const scrapedJobService = {
 
   // ✅ Delete Scraped Job
   async deleteScrapedJob(id: string): Promise<ScrapedJobActionResponse> {
-    const response = await apiClient.delete<ApiResponse<ScrapedJobActionResponse>>(
-      API_ENDPOINTS.SCRAPER_JOB_DETAIL(id)
-    );
+    const response = await apiClient.delete<
+      ApiResponse<ScrapedJobActionResponse>
+    >(API_ENDPOINTS.SCRAPER_JOB_DETAIL(id));
     return response.data;
   },
 
   // ✅ Generate Jobs (AI/Mock)
-  async generateJobs(params: GenerateJobsRequest): Promise<GenerateJobsResponse> {
-    const response = await apiClient.get<ApiResponse<GenerateJobsResponse>>(
-      `${API_ENDPOINTS.SCRAPER_JOB_GENERATE}?source=${params.source}&category=${encodeURIComponent(params.category)}&count=${params.count}`
-    );
-    return response.data;
+  async generateJobs(
+    params: GenerateJobsRequest
+  ): Promise<GenerateJobsResponse> {
+    try {
+      const response = await apiClient.get<ApiResponse<GenerateJobsResponse>>(
+        `${API_ENDPOINTS.SCRAPER_JOB_GENERATE}?surce=${
+          params.source
+        }&category=${encodeURIComponent(params.category)}&count=${params.count}`
+      );
+      return response.data;
+    } catch (err: any) {
+      throw new Error(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to generate jobs"
+      );
+    }
   },
 };

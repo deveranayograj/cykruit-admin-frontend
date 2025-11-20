@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ChevronRight, Sparkles, Database, Loader2, Plus, CheckCircle, XCircle } from 'lucide-react';
 import { scrapedJobService } from "@/services/scrapedJobService";
 import { GeneratedJob, CreateScrapedJobDto } from "@/types/scraped-job";
+import { useApi } from "@/hooks/useApi";
 
 // Breadcrumb Component
 const Breadcrumb: React.FC = () => {
@@ -114,8 +115,6 @@ const GenerateJobsPage: React.FC = () => {
 
   // Generated jobs state
   const [generatedJobs, setGeneratedJobs] = useState<GeneratedJob[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generateError, setGenerateError] = useState<string | null>(null);
 
   // Insert state
   const [insertingJobIds, setInsertingJobIds] = useState<Set<string>>(new Set());
@@ -124,33 +123,33 @@ const GenerateJobsPage: React.FC = () => {
   const [isBulkInserting, setIsBulkInserting] = useState(false);
 
   // Handle Generate
-  const handleGenerate = async () => {
-    setIsGenerating(true);
-    setGenerateError(null);
-    setGeneratedJobs([]);
-    setInsertedJobIds(new Set());
-    setFailedJobIds(new Set());
-
-    try {
-      const response = await scrapedJobService.generateJobs({
-        source,
-        category,
-        count,
-      });
-
-      // Add temporary IDs for tracking
-      const jobsWithIds = response.jobs.map((job, index) => ({
+  // useApi for generate jobs
+  const {
+    loading: generating,
+    error: generateErrorState,
+    execute: executeGenerate
+  } = useApi({
+    onSuccess: (response: any) => {
+      const jobsWithIds = response.jobs.map((job: any, index: number) => ({
         ...job,
         _tempId: `temp-${Date.now()}-${index}`,
       }));
-
       setGeneratedJobs(jobsWithIds);
-    } catch (error: any) {
-      setGenerateError(error.message || 'Failed to generate jobs');
-    } finally {
-      setIsGenerating(false);
+      setInsertedJobIds(new Set());
+      setFailedJobIds(new Set());
     }
+  });
+
+  const handleGenerate = () => {
+    executeGenerate(() =>
+      scrapedJobService.generateJobs({
+        source,
+        category,
+        count
+      })
+    );
   };
+
 
   // Convert GeneratedJob to CreateScrapedJobDto format
   const convertToCreateDto = (job: GeneratedJob): CreateScrapedJobDto => {
@@ -331,10 +330,10 @@ const GenerateJobsPage: React.FC = () => {
 
         <button
           onClick={handleGenerate}
-          disabled={isGenerating}
+          disabled={generating}
           className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isGenerating ? (
+          {generating ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
               Generating Jobs...
@@ -347,10 +346,10 @@ const GenerateJobsPage: React.FC = () => {
           )}
         </button>
 
-        {generateError && (
+        {generateErrorState && (
           <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
             <p className="font-medium">Error:</p>
-            <p className="text-sm">{generateError}</p>
+            <p className="text-sm">{generateErrorState.message || "Something went wrong"}</p>
           </div>
         )}
       </div>

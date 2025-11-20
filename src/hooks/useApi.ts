@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useCallback } from 'react';
-import { ApiError } from '@/types/auth';
+import { useState, useCallback } from "react";
+import { ApiError } from "@/types/auth";
 
 interface UseApiOptions {
   onSuccess?: (data: any) => void;
@@ -24,7 +24,12 @@ export const useApi = <T = any>(options?: UseApiOptions) => {
         return result;
       } catch (err: any) {
         const apiError: ApiError = {
-          message: err.message || 'An error occurred',
+          message:
+            typeof err?.response?.data?.message === "string"
+              ? err.response.data.message
+              : JSON.stringify(err?.response?.data?.message) ||
+                err.message ||
+                "An error occurred",
           code: err.code,
           errors: err.errors,
         };
