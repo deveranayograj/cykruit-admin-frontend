@@ -151,7 +151,17 @@ export const JobInfoCard: React.FC<{ job: JobDetail }> = ({ job }) => {
       {/* Description */}
       <div className="border-t border-gray-200 pt-6">
         <h3 className="text-lg font-semibold mb-4">Job Description</h3>
-        <div className="prose prose-sm max-w-none text-gray-700">{job.description}</div>
+        <div
+          className="text-gray-700 leading-relaxed prose prose-sm max-w-none
+    prose-headings:text-gray-900 prose-headings:font-bold prose-headings:mb-3 prose-headings:mt-6
+    prose-p:text-gray-700 prose-p:my-3 prose-p:leading-relaxed
+    prose-ul:my-3 prose-ul:list-disc prose-ul:pl-5 prose-ul:space-y-1.5
+    prose-ol:my-3 prose-ol:list-decimal prose-ol:pl-5 prose-ol:space-y-1.5
+    prose-li:text-gray-700 prose-li:leading-relaxed
+    prose-strong:text-gray-900 prose-strong:font-semibold
+    prose-a:text-[#1B3C8B] prose-a:no-underline hover:prose-a:underline"
+          dangerouslySetInnerHTML={{ __html: job.description }}
+        />
       </div>
 
       {/* Application / Links */}
@@ -186,7 +196,7 @@ export const JobInfoCard: React.FC<{ job: JobDetail }> = ({ job }) => {
             {job.reviewer ? (
               <>
                 <div className="font-medium">{job.reviewer.firstName} {job.reviewer.lastName}</div>
-                <div className="flex items-center gap-2 text-xs text-gray-500"> 
+                <div className="flex items-center gap-2 text-xs text-gray-500">
                   <Mail className="w-3 h-3" /> {job.reviewer.email}
                 </div>
               </>
@@ -264,7 +274,7 @@ export const JobInfoCard: React.FC<{ job: JobDetail }> = ({ job }) => {
             {(job.screeningQuestions || []).length === 0 ? (
               <div className="text-gray-400">No screening questions</div>
             ) : (
-              (job.screeningQuestions || []).slice(0,3).map(q => (
+              (job.screeningQuestions || []).slice(0, 3).map(q => (
                 <div key={q.id} className="truncate">
                   • {q.question} {q.required ? <span className="text-red-500">*</span> : null}
                 </div>
