@@ -58,7 +58,10 @@ export const jobService = {
   },
 
   // ✅ Update Job
-  async updateJob(id: string, data: JobUpdateRequest): Promise<JobUpdateResponse> {
+  async updateJob(
+    id: string,
+    data: JobUpdateRequest
+  ): Promise<JobUpdateResponse> {
     const response = await apiClient.put<ApiResponse<JobUpdateResponse>>(
       API_ENDPOINTS.JOB_DETAIL(id),
       data
@@ -72,5 +75,34 @@ export const jobService = {
       API_ENDPOINTS.JOB_DETAIL(id)
     );
     return response.data; // ✅ unwrap
+  },
+
+  // ✅ NEW: Approve job
+  async approveJob(jobId: string, remarks?: string): Promise<JobDetail> {
+    const response = await apiClient.post<ApiResponse<JobDetail>>(
+      API_ENDPOINTS.JOB_APPROVE,
+      {
+        jobId,
+        remarks,
+      }
+    );
+    return response.data;
+  },
+
+  // ✅ NEW: Reject job
+  async rejectJob(
+    jobId: string,
+    rejectionReason: string,
+    remarks?: string
+  ): Promise<JobDetail> {
+    const response = await apiClient.post<ApiResponse<JobDetail>>(
+      API_ENDPOINTS.JOB_REJECT,
+      {
+        jobId,
+        rejectionReason,
+        remarks,
+      }
+    );
+    return response.data;
   },
 };

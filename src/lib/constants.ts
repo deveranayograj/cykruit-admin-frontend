@@ -27,6 +27,8 @@ export const API_ENDPOINTS = {
   // Jobs
   JOBS_LIST: "/jobs",
   JOB_DETAIL: (id: string) => `/jobs/${id}`,
+  JOB_APPROVE: `/jobs/moderation/approve`,
+  JOB_REJECT: `/jobs/moderation/reject`,
 
   // Jobs-scraper
   SCRAPER_JOBS: "/scraper/jobs",
